@@ -32,25 +32,28 @@ cpp_int factorial(cpp_int numberGiven) {
 
 void factorialPartition(cpp_int& block2, cpp_int block1) {
 
+    cpp_int difference = block2 - block1;
     cpp_int result = 1;
-    for (cpp_int i = 0;i < block1;i++) result = result * (block2 - i);
 
+    for (cpp_int i = 0;i < difference;i++) result *= (block2 - i);
+    
     block2 = result;
 }
 cpp_int calculateFactorial(cpp_int& block1, cpp_int& block2, cpp_int& block3, cpp_int& block4, cpp_int& block5, cpp_int& block6) {
 
-    std::thread thread1(factorialPartition, std::ref(block6), (block6 - block5));
-    std::thread thread2(factorialPartition, std::ref(block5), block1);
-    std::thread thread3(factorialPartition, std::ref(block4), block1);
-    std::thread thread4(factorialPartition, std::ref(block3), block1);
+    std::thread thread1(factorialPartition, std::ref(block6), block5);
+    std::thread thread2(factorialPartition, std::ref(block5), block4);
+    std::thread thread3(factorialPartition, std::ref(block4), block3);
+    std::thread thread4(factorialPartition, std::ref(block3), block2);
     std::thread thread5(factorialPartition, std::ref(block2), block1);
-    std::thread thread6(factorialPartition, std::ref(block1), block1);
-    thread6.join();
-    thread5.join();
-    thread4.join();
-    thread3.join();
-    thread2.join();
+    std::thread thread6(factorialPartition, std::ref(block1), 0);
+
     thread1.join();
+    thread2.join();
+    thread3.join();
+    thread4.join();
+    thread5.join();
+    thread6.join();
 
     return block1 * block2 * block3 * block4 * block5 * block6;
 }
